@@ -1,0 +1,12 @@
+{
+    "info": "you can change the values in this file", 
+    "endpoint": "https://classic.warcraftlogs.com/v1/",
+    "server_name": "razorgore",
+    "wow_classic": true,
+    "server_location": "eu",
+    "hours_sleep": 24,
+    "interval_between_scrape_min": 1,
+    "interval_between_scrape_max": 5,
+    "character_file": "characters.xlsx",
+    "update_only_once_a_day": true
+}
