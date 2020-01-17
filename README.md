@@ -1,0 +1,2 @@
+# warcraft_logs_scraper
+warcraft_logs_scraper
