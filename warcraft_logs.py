@@ -69,6 +69,10 @@ def get_scores(char_id_spec):
 
 
 def manipulate_df(df):
+    if 'char_id' not in df:
+        for i in ['char_id', 'updated', 'best_score', 'median_score']:
+            df[i] = None
+
     df['char_id'] = df.apply(lambda x: x['char_id'] if pd.isna(x['char_id']) == False else get_char_id(x['char_name']), axis=1)
     df['char_class'] = df['char_id'].apply(lambda x: x.split("_")[2]if x else "")
     if settings["update_only_once_a_day"]:
