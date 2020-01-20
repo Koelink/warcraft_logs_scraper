@@ -32,9 +32,9 @@ def get_char_id(character):
         print(f"Getting char_id for {character}")
         endpoint = f'{settings["endpoint"]}rankings/character/{character}/{settings["server_name"]}/{settings["server_location"]}?api_key={secrets["public_key"]}'
         data = requests.get(endpoint).json()
-        char_id = data[0]['characterID']
-        char_spec = data[0]['spec']
-        char_class = data[0]['class']
+        char_id = data[-1]['characterID']
+        char_spec = data[-1]['spec']
+        char_class = data[-1]['class']
         print(f"Char_id found for {character}\n")
         return f'{char_id}_{char_spec}_{char_class}'
     except:
@@ -98,6 +98,11 @@ def save_df(df):
             sleep(5)
 
 
+def extra(df):
+    classes = df.char_class.unique()
+    print(classes)
+
+
 def main():
     while True:
         global settings
@@ -111,7 +116,9 @@ def main():
         print(df)
         print("Done!")
         print(f"Next check in {settings['hours_sleep']} hours")
+        extra(df)
         sleep(settings["hours_sleep"]*3600)
+        
 
 
 if __name__ == "__main__":
