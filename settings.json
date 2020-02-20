@@ -8,5 +8,9 @@
     "interval_between_scrape_min": 1,
     "interval_between_scrape_max": 5,
     "character_file": "characters.xlsx",
-    "update_only_once_a_day": true
+    "update_only_once_a_day": true,
+    "phase_1_2": "1",
+    "phase_3": "2",
+    "molten_core": "1000",
+    "blackwing": "1002
 }
