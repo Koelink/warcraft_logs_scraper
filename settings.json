@@ -1,6 +1,7 @@
 {
     "info": "you can change the values in this file", 
     "endpoint": "https://classic.warcraftlogs.com/v1/",
+    "total_endpoint": "https://classic.warcraftlogs.com/character/rankings-zone/{char_id}/{char_spec}/3/{zone}/0/3/40/{phase}/Any/rankings/0/0?dpstype=rdps",
     "server_name": "razorgore",
     "wow_classic": true,
     "server_location": "eu",
@@ -12,5 +13,16 @@
     "phase_1_2": "1",
     "phase_3": "2",
     "molten_core": "1000",
-    "blackwing": "1002
+    "blackwing": "1002",
+    "phasezones": [
+        {"name": "MC12",
+        "phase": "1",
+        "zone": "1000"},
+        {"name": "MC3",
+        "phase": "2",
+        "zone": "1000"},
+        {"name": "BWL3",
+        "phase": "2",
+        "zone": "1002"}
+    ]
 }
