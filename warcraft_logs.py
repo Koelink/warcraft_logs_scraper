@@ -11,7 +11,8 @@ from time import sleep
 
 # Koelink 2020
 # https://github.com/Koelink/warcraft_logs_scraper/
-# V0.1.20200117.2
+# BTC: 3CEsZ5XekUqauM38znKBrHezvdHoCpNjoS
+# V0.2.20200225.1
 
 # spreadsheetfile: https://docs.google.com/spreadsheets/d/1NcVmYzOJ-XSx55dQ41WYCURgJDFzsCfhqfTZuU9GbRs/edit#gid=1275718546
 
@@ -31,7 +32,10 @@ def get_char_id(character):
     try:
         print(f"Getting char_id for {character}")
         endpoint = f'{settings["endpoint"]}rankings/character/{character}/{settings["server_name"]}/{settings["server_location"]}?api_key={secrets["public_key"]}'
-        data = requests.get(endpoint).json()
+        r = requests.get(endpoint)
+        print(r)
+        data = r.json()
+        print(data)
         char_id = data[-1]['characterID']
         char_spec = data[-1]['spec']
         char_class = data[-1]['class']
@@ -42,7 +46,7 @@ def get_char_id(character):
         return ""
 
 
-def get_scores(char_id_spec):
+def get_scores(char_id_spec, phasezones):
     try:
         sleep(randint(settings["interval_between_scrape_min"],settings["interval_between_scrape_max"]))
         char_id, char_spec, char_class = char_id_spec.split("_")
@@ -56,7 +60,7 @@ def get_scores(char_id_spec):
         else:
             char_spec = "dps"
         print(char_id_spec)
-        response = requests.get(f'https://classic.warcraftlogs.com/character/rankings-zone/{char_id}/{char_spec}/3/1000/0/3/40/1/Any/rankings/0/0?dpstype=rdps', headers=headers)
+        response = requests.get(f"https://classic.warcraftlogs.com/character/rankings-zone/{char_id}/{char_spec}/3/{phasezones['zone']}/0/3/40/{phasezones['phase']}/Any/rankings/0/0?dpstype=rdps", headers=headers)
         soup = BeautifulSoup(response.content, 'html.parser')
         median = soup.find(True, {"class": ["median-perf-avg"]}).get_text().split()[3]
         best_pa = soup.find(True, {"class": ["best-perf-avg"]}).get_text().split()[-1]
@@ -75,15 +79,14 @@ def manipulate_df(df):
 
     df['char_id'] = df.apply(lambda x: x['char_id'] if pd.isna(x['char_id']) == False else get_char_id(x['char_name']), axis=1)
     df['char_class'] = df['char_id'].apply(lambda x: x.split("_")[2]if x else "")
-    if settings["update_only_once_a_day"]:
-        df['high_median'] = df.apply(lambda x: get_scores(x['char_id']) if x['updated'] != str(date.today()) else False, axis=1)
-    else:
-        df['high_median'] = df.apply(lambda x: get_scores(x['char_id']), axis=1)
-    df['best_score'] = df.apply(lambda x: x['high_median'].split("_")[0] if x['high_median'] != False and x["char_class"] != "" else x['best_score'], axis=1)
-    df['median_score'] = df.apply(lambda x: x['high_median'].split("_")[1] if x['high_median'] else x['median_score'], axis=1)
-    df['updated'] = df.apply(lambda x: x['high_median'].split("_")[2] if x['updated'] != str(date.today()) and x['high_median'] != None else df["updated"], axis=1)
-    df['updated'] = df.apply(lambda x: str(date.today()) if len(x['updated']) != 10 else x['updated'], axis=1)
-    df = df[["char_id", "updated", "char_name", "char_class", "median_score", "best_score"]]
+    df_list = ["char_id", "char_name", "char_class"]
+    for z in settings["phasezones"]:
+        df['high_median'] = df.apply(lambda x: get_scores(x['char_id'], z), axis=1)
+        df[f'{z["name"]}_median_score'] = df.apply(lambda x: x['high_median'].split("_")[1] if x['high_median'] else x[f'{z["name"]}_median_score'], axis=1)
+        df[f'{z["name"]}_best_score'] = df.apply(lambda x: x['high_median'].split("_")[0] if x['high_median'] != False and x["char_class"] != "" else x[f'{z["name"]}_best_score'], axis=1)
+        df['updated'] = df.apply(lambda x: x['high_median'].split("_")[2] if x['updated'] != str(date.today()) and x['high_median'] != None else df["updated"], axis=1)
+        df['updated'] = df.apply(lambda x: str(date.today()) if len(x['updated']) != 10 else x['updated'], axis=1)
+    df.drop(['high_median'], axis=1, inplace=True)
     return df
 
 
