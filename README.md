@@ -3,7 +3,7 @@ warcraft_logs_scraper
 
 Settings are for the ADC guild
 
-Needs an "secret.json" to work with 1 line:
+Needs a "secret.json" to work with 1 line:
 {
   "public_key": your public key
 }
